@@ -137,29 +137,57 @@ static void draw_globe(GContext *ctx) {
     GPoint(129, 220), GPoint(125, 170), GPoint(129, 120), GPoint(140, 93)
   };
   static const GPoint latitude_wide[] = {
-    GPoint(67, 113), GPoint(88, 101), GPoint(119, 94), GPoint(155, 93),
-    GPoint(191, 94), GPoint(222, 101), GPoint(243, 113)
+    GPoint(88, 113), GPoint(105, 102), GPoint(122, 96), GPoint(139, 94),
+    GPoint(155, 93), GPoint(171, 94), GPoint(188, 96), GPoint(205, 102),
+    GPoint(222, 113)
   };
   static const GPoint latitude_wide_bottom[] = {
-    GPoint(67, 227), GPoint(88, 239), GPoint(119, 246), GPoint(155, 247),
-    GPoint(191, 246), GPoint(222, 239), GPoint(243, 227)
+    GPoint(88, 227), GPoint(105, 238), GPoint(122, 244), GPoint(139, 246),
+    GPoint(155, 247), GPoint(171, 246), GPoint(188, 244), GPoint(205, 238),
+    GPoint(222, 227)
+  };
+  static const GPoint latitude_high[] = {
+    GPoint(105, 98), GPoint(117, 91), GPoint(130, 87), GPoint(142, 86),
+    GPoint(155, 85), GPoint(168, 86), GPoint(180, 87), GPoint(193, 91),
+    GPoint(205, 98)
+  };
+  static const GPoint latitude_high_bottom[] = {
+    GPoint(105, 242), GPoint(117, 249), GPoint(130, 253), GPoint(142, 254),
+    GPoint(155, 255), GPoint(168, 254), GPoint(180, 253), GPoint(193, 249),
+    GPoint(205, 242)
+  };
+  static const GPoint latitude_low[] = {
+    GPoint(80, 124), GPoint(99, 118), GPoint(118, 114), GPoint(137, 113),
+    GPoint(155, 112), GPoint(173, 113), GPoint(192, 114), GPoint(211, 118),
+    GPoint(230, 124)
+  };
+  static const GPoint latitude_low_bottom[] = {
+    GPoint(80, 216), GPoint(99, 222), GPoint(118, 226), GPoint(137, 227),
+    GPoint(155, 228), GPoint(173, 227), GPoint(192, 226), GPoint(211, 222),
+    GPoint(230, 216)
   };
   static const GPoint latitude_narrow[] = {
-    GPoint(67, 141), GPoint(94, 135), GPoint(125, 132), GPoint(155, 132),
-    GPoint(185, 132), GPoint(216, 135), GPoint(243, 141)
+    GPoint(72, 141), GPoint(93, 136), GPoint(114, 133), GPoint(135, 132),
+    GPoint(155, 132), GPoint(175, 132), GPoint(196, 133), GPoint(217, 136),
+    GPoint(238, 141)
   };
   static const GPoint latitude_narrow_bottom[] = {
-    GPoint(67, 199), GPoint(94, 205), GPoint(125, 208), GPoint(155, 208),
-    GPoint(185, 208), GPoint(216, 205), GPoint(243, 199)
+    GPoint(72, 199), GPoint(93, 204), GPoint(114, 207), GPoint(135, 208),
+    GPoint(155, 208), GPoint(175, 208), GPoint(196, 207), GPoint(217, 204),
+    GPoint(238, 199)
   };
 
   graphics_context_set_stroke_color(ctx, COLOR_DAY);
-  graphics_context_set_stroke_width(ctx, 2);
+  graphics_context_set_stroke_width(ctx, 1);
   graphics_draw_circle(ctx, GPoint(155, 170), 88);
   draw_polyline(ctx, meridian_wide, sizeof(meridian_wide) / sizeof(meridian_wide[0]), true);
   draw_polyline(ctx, meridian_narrow, sizeof(meridian_narrow) / sizeof(meridian_narrow[0]), true);
   draw_polyline(ctx, latitude_wide, sizeof(latitude_wide) / sizeof(latitude_wide[0]), false);
   draw_polyline(ctx, latitude_wide_bottom, sizeof(latitude_wide_bottom) / sizeof(latitude_wide_bottom[0]), false);
+  draw_polyline(ctx, latitude_high, sizeof(latitude_high) / sizeof(latitude_high[0]), false);
+  draw_polyline(ctx, latitude_high_bottom, sizeof(latitude_high_bottom) / sizeof(latitude_high_bottom[0]), false);
+  draw_polyline(ctx, latitude_low, sizeof(latitude_low) / sizeof(latitude_low[0]), false);
+  draw_polyline(ctx, latitude_low_bottom, sizeof(latitude_low_bottom) / sizeof(latitude_low_bottom[0]), false);
   draw_polyline(ctx, latitude_narrow, sizeof(latitude_narrow) / sizeof(latitude_narrow[0]), false);
   draw_polyline(ctx, latitude_narrow_bottom, sizeof(latitude_narrow_bottom) / sizeof(latitude_narrow_bottom[0]), false);
   graphics_context_set_stroke_width(ctx, 1);
