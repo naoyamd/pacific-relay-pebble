@@ -153,7 +153,8 @@ static void draw_globe(GContext *ctx) {
     GPoint(185, 208), GPoint(216, 205), GPoint(243, 199)
   };
 
-  graphics_context_set_stroke_color(ctx, COLOR_GRID);
+  graphics_context_set_stroke_color(ctx, COLOR_DAY);
+  graphics_context_set_stroke_width(ctx, 2);
   graphics_draw_circle(ctx, GPoint(155, 170), 88);
   draw_polyline(ctx, meridian_wide, sizeof(meridian_wide) / sizeof(meridian_wide[0]), true);
   draw_polyline(ctx, meridian_narrow, sizeof(meridian_narrow) / sizeof(meridian_narrow[0]), true);
@@ -161,12 +162,13 @@ static void draw_globe(GContext *ctx) {
   draw_polyline(ctx, latitude_wide_bottom, sizeof(latitude_wide_bottom) / sizeof(latitude_wide_bottom[0]), false);
   draw_polyline(ctx, latitude_narrow, sizeof(latitude_narrow) / sizeof(latitude_narrow[0]), false);
   draw_polyline(ctx, latitude_narrow_bottom, sizeof(latitude_narrow_bottom) / sizeof(latitude_narrow_bottom[0]), false);
+  graphics_context_set_stroke_width(ctx, 1);
 }
 
 static void draw_route(GContext *ctx) {
   static const GPoint route[] = {
     GPoint(16, 98), GPoint(32, 93), GPoint(48, 89), GPoint(68, 86),
-    GPoint(92, 83), GPoint(116, 86), GPoint(136, 89), GPoint(152, 93),
+    GPoint(100, 83), GPoint(132, 86), GPoint(152, 89), GPoint(168, 93),
     GPoint(184, 98)
   };
 
@@ -181,9 +183,9 @@ static void draw_route(GContext *ctx) {
   graphics_context_set_fill_color(ctx, COLOR_WHITE);
   graphics_fill_circle(ctx, GPoint(48, 89), 2);
   graphics_context_set_fill_color(ctx, COLOR_AMBER);
-  graphics_fill_circle(ctx, GPoint(92, 83), 2);
+  graphics_fill_circle(ctx, GPoint(100, 83), 2);
   graphics_context_set_fill_color(ctx, COLOR_WHITE);
-  graphics_fill_circle(ctx, GPoint(136, 89), 2);
+  graphics_fill_circle(ctx, GPoint(152, 89), 2);
   graphics_context_set_fill_color(ctx, COLOR_CYAN);
   graphics_fill_circle(ctx, GPoint(184, 98), 3);
 
@@ -212,16 +214,24 @@ static void draw_header(GContext *ctx) {
   graphics_draw_text(ctx, s_jst_date, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
                      GRect(117, 19, 74, 16), GTextOverflowModeFill, GTextAlignmentRight, NULL);
 
-  graphics_draw_text(ctx, s_jst_time, fonts_get_system_font(FONT_KEY_BITHAM_42_BOLD),
-                     GRect(8, 31, 143, 47), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+  const GFont time_font = fonts_get_system_font(FONT_KEY_ROBOTO_BOLD_SUBSET_49);
+  const GRect time_frame = GRect(8, 27, 180, 58);
+  const GSize time_size = graphics_text_layout_get_content_size(
+      s_jst_time, time_font, time_frame, GTextOverflowModeFill, GTextAlignmentLeft);
+  int period_x = 8 + time_size.w + 2;
+  if (period_x > 162) {
+    period_x = 162;
+  }
+  graphics_draw_text(ctx, s_jst_time, time_font, time_frame,
+                     GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_context_set_text_color(ctx, COLOR_CORAL);
   graphics_draw_text(ctx, s_jst_period, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
-                     GRect(153, 35, 38, 18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+                     GRect(period_x, 35, 38, 18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
 }
 
 static void draw_sfo_strip(GContext *ctx) {
-  const GRect inner = GRect(9, 119, 182, 44);
-  const int left_width = 124;
+  const GRect inner = GRect(9, 129, 182, 40);
+  const int left_width = 112;
   const GColor left_color = s_sfo_day ? COLOR_DAY : COLOR_NIGHT;
   const GColor right_color = s_sfo_day ? COLOR_AMBER : COLOR_INK;
   const GColor border_color = s_sfo_day ? COLOR_CYAN : COLOR_GRID;
@@ -234,64 +244,69 @@ static void draw_sfo_strip(GContext *ctx) {
   graphics_fill_rect(ctx, GRect(inner.origin.x + left_width, inner.origin.y,
                                 inner.size.w - left_width, inner.size.h), 0, GCornerNone);
   graphics_context_set_stroke_color(ctx, border_color);
-  graphics_draw_rect(ctx, GRect(8, 118, 184, 46));
+  graphics_draw_rect(ctx, GRect(8, 128, 184, 42));
   graphics_context_set_fill_color(ctx, rail_color);
-  graphics_fill_rect(ctx, GRect(9, 119, 3, 44), 0, GCornerNone);
+  graphics_fill_rect(ctx, GRect(9, 129, 3, 40), 0, GCornerNone);
 
   graphics_context_set_text_color(ctx, COLOR_CYAN);
   graphics_draw_text(ctx, s_sfo_zone, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
-                     GRect(17, 120, 108, 16), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+                     GRect(17, 130, 102, 16), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_context_set_text_color(ctx, right_text);
   graphics_draw_text(ctx, "LOCAL", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
-                     GRect(140, 120, 45, 16), GTextOverflowModeFill, GTextAlignmentRight, NULL);
+                     GRect(140, 130, 45, 16), GTextOverflowModeFill, GTextAlignmentRight, NULL);
 
+  const GFont sfo_time_font = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
+  const GRect sfo_time_frame = GRect(17, 139, 102, 29);
+  const GSize sfo_time_size = graphics_text_layout_get_content_size(
+      s_sfo_time, sfo_time_font, sfo_time_frame, GTextOverflowModeFill, GTextAlignmentLeft);
+  const int sfo_period_x = 17 + sfo_time_size.w + 2;
   graphics_context_set_text_color(ctx, COLOR_WHITE);
-  graphics_draw_text(ctx, s_sfo_time, fonts_get_system_font(FONT_KEY_GOTHIC_24_BOLD),
-                     GRect(17, 131, 112, 28), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+  graphics_draw_text(ctx, s_sfo_time, sfo_time_font, sfo_time_frame,
+                     GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_context_set_text_color(ctx, COLOR_CORAL);
   graphics_draw_text(ctx, s_sfo_period, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
-                     GRect(91, 135, 24, 16), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+                     GRect(sfo_period_x, 143, 24, 16), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_context_set_text_color(ctx, right_text);
   graphics_draw_text(ctx, s_sfo_date, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
-                     GRect(118, 148, 73, 16), GTextOverflowModeFill, GTextAlignmentRight, NULL);
+                     GRect(121, 153, 70, 16), GTextOverflowModeFill, GTextAlignmentRight, NULL);
 }
 
 static void draw_footsteps(GContext *ctx) {
   graphics_context_set_fill_color(ctx, COLOR_CORAL);
-  graphics_fill_circle(ctx, GPoint(22, 194), 3);
-  graphics_fill_circle(ctx, GPoint(28, 187), 3);
-  graphics_fill_circle(ctx, GPoint(18, 188), 1);
-  graphics_fill_circle(ctx, GPoint(23, 184), 1);
-  graphics_fill_circle(ctx, GPoint(28, 181), 1);
-  graphics_fill_circle(ctx, GPoint(33, 184), 1);
+  graphics_fill_circle(ctx, GPoint(22, 206), 3);
+  graphics_fill_circle(ctx, GPoint(28, 199), 3);
+  graphics_fill_circle(ctx, GPoint(18, 200), 1);
+  graphics_fill_circle(ctx, GPoint(23, 196), 1);
+  graphics_fill_circle(ctx, GPoint(28, 193), 1);
+  graphics_fill_circle(ctx, GPoint(33, 196), 1);
 }
 
 static void draw_status_band(GContext *ctx) {
   graphics_context_set_fill_color(ctx, COLOR_INK);
-  graphics_fill_rect(ctx, GRect(0, 171, 200, 47), 0, GCornerNone);
+  graphics_fill_rect(ctx, GRect(0, 184, 200, 34), 0, GCornerNone);
   graphics_context_set_fill_color(ctx, COLOR_CORAL);
-  graphics_fill_rect(ctx, GRect(0, 171, 3, 47), 0, GCornerNone);
+  graphics_fill_rect(ctx, GRect(0, 184, 3, 34), 0, GCornerNone);
   graphics_context_set_fill_color(ctx, COLOR_CYAN);
-  graphics_fill_rect(ctx, GRect(197, 171, 3, 47), 0, GCornerNone);
+  graphics_fill_rect(ctx, GRect(197, 184, 3, 34), 0, GCornerNone);
 
   draw_footsteps(ctx);
   graphics_context_set_text_color(ctx, COLOR_WHITE);
   graphics_draw_text(ctx, s_steps_text, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
-                     GRect(42, 183, 66, 20), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+                     GRect(42, 191, 66, 20), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
 
   graphics_context_set_stroke_color(ctx, COLOR_CYAN);
-  graphics_draw_rect(ctx, GRect(122, 186, 29, 14));
+  graphics_draw_rect(ctx, GRect(122, 194, 29, 14));
   graphics_context_set_fill_color(ctx, COLOR_CYAN);
-  graphics_fill_rect(ctx, GRect(151, 190, 3, 6), 0, GCornerNone);
+  graphics_fill_rect(ctx, GRect(151, 198, 3, 6), 0, GCornerNone);
   graphics_context_set_fill_color(ctx, COLOR_AMBER);
   int fill_width = (int)(24 * s_battery / 100);
   if (fill_width < 1 && s_battery > 0) {
     fill_width = 1;
   }
-  graphics_fill_rect(ctx, GRect(125, 189, fill_width, 8), 0, GCornerNone);
+  graphics_fill_rect(ctx, GRect(125, 197, fill_width, 8), 0, GCornerNone);
   graphics_context_set_text_color(ctx, COLOR_WHITE);
   graphics_draw_text(ctx, s_battery_text, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
-                     GRect(158, 183, 34, 20), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+                     GRect(158, 191, 34, 20), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
 }
 
 static void canvas_update_proc(Layer *layer, GContext *ctx) {
