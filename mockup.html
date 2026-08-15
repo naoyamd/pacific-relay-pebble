@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>PACIFIC RELAY — Pebble Time 2 Watchface</title>
+  <style>
+    * { box-sizing: border-box; }
+
+    html,
+    body {
+      background: #000033;
+    }
+
+    body {
+      margin: 0;
+      padding: 24px 12px 32px;
+      color: #FFFFFF;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+
+    .board {
+      width: 100%;
+      max-width: 640px;
+      margin: 0 auto;
+    }
+
+    .intro {
+      border-left: 3px solid #ff5555;
+      padding-left: 12px;
+    }
+
+    .eyebrow {
+      margin: 0 0 5px;
+      color: #ffaa00;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 2px;
+    }
+
+    h1 {
+      margin: 0;
+      color: #FFFFFF;
+      font-size: 30px;
+      letter-spacing: 3px;
+      line-height: 1;
+    }
+
+    .concept {
+      max-width: 520px;
+      margin: 10px 0 0;
+      color: #AAAAAA;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    .palette {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-top: 14px;
+    }
+
+    .swatch {
+      display: inline-flex;
+      gap: 5px;
+      align-items: center;
+      color: #AAAAAA;
+      font-size: 10px;
+      letter-spacing: .4px;
+    }
+
+    .swatch i {
+      display: block;
+      width: 11px;
+      height: 11px;
+      border: 1px solid #AAAAAA;
+    }
+
+    .swatch .oxford { background: #000055; }
+    .swatch .ink { background: #000033; }
+    .swatch .white { background: #FFFFFF; }
+    .swatch .cyan { background: #00ffff; }
+    .swatch .coral { background: #ff5555; }
+    .swatch .amber { background: #ffaa00; }
+    .swatch .gray { background: #AAAAAA; }
+    .swatch .sfo-day { background: #0055AA; border-color: #00FFFF; }
+    .swatch .sfo-night { background: #550055; border-color: #0000AA; }
+
+    .preview-shell {
+      width: 404px;
+      max-width: 100%;
+      height: 460px;
+      margin: 24px auto 0;
+      padding: 2px;
+      overflow-x: auto;
+      overflow-y: hidden;
+      border: 1px solid #AAAAAA;
+      background: #000033;
+    }
+
+  .watchface {
+    position: relative;
+    width: 200px;
+    height: 228px;
+      overflow: hidden;
+      color: #FFFFFF;
+      background: #000055;
+      border: 1px solid #AAAAAA;
+      font-variant-numeric: tabular-nums;
+    transform: scale(2);
+    transform-origin: top left;
+  }
+
+  .globe {
+    position: absolute;
+    top: 80px;
+    left: 65px;
+    z-index: 0;
+    width: 180px;
+    height: 180px;
+    pointer-events: none;
+  }
+
+  .watchface > *:not(.globe) {
+    z-index: 1;
+  }
+
+    .brand,
+    .flight-number,
+    .primary-kicker,
+    .primary-date,
+    .route-from,
+    .route-to,
+    .dateline,
+    .sfo-code,
+    .local-label,
+    .sfo-date {
+      position: absolute;
+      white-space: nowrap;
+    }
+
+    .brand {
+      top: 7px;
+      left: 9px;
+      color: #ffaa00;
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+    }
+
+    .flight-number {
+      top: 7px;
+      right: 9px;
+      color: #AAAAAA;
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    .primary-kicker {
+      top: 21px;
+      left: 9px;
+      color: #ff5555;
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 1.1px;
+    }
+
+    .primary-date {
+      top: 21px;
+      right: 9px;
+      color: #FFFFFF;
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: .7px;
+    }
+
+    .primary-time {
+      position: absolute;
+      top: 30px;
+      left: 9px;
+      display: flex;
+      align-items: flex-start;
+      color: #FFFFFF;
+      font-size: 50px;
+      font-weight: 700;
+      letter-spacing: -3px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .primary-time .period {
+      margin: 5px 0 0 4px;
+      color: #ff5555;
+      font-size: 13px;
+      letter-spacing: 0;
+      line-height: 1;
+    }
+
+  .route-map {
+    position: absolute;
+    top: 80px;
+    left: 8px;
+    width: 184px;
+    height: 28px;
+    }
+
+  .route-from,
+  .route-to {
+    top: 104px;
+    color: #FFFFFF;
+    font-size: 7px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    line-height: 7px;
+    }
+
+    .route-from { left: 9px; }
+    .route-to { right: 9px; }
+
+  .dateline {
+      top: 90px;
+      left: 77px;
+      width: 46px;
+      color: #ffaa00;
+      font-size: 6px;
+      font-weight: 700;
+      letter-spacing: .6px;
+      text-align: center;
+    }
+
+  .sfo-strip {
+    position: absolute;
+    top: 118px;
+    right: 8px;
+    left: 8px;
+    height: 46px;
+    background: #000033;
+    border: 1px solid #00ffff;
+  }
+
+  .sfo-strip::before,
+  .sfo-strip::after {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    z-index: 0;
+    content: "";
+  }
+
+  .sfo-strip::before {
+    left: 0;
+    width: 68%;
+    background: #000033;
+    border-left: 3px solid #00FFFF;
+  }
+
+  .sfo-strip::after {
+    right: 0;
+    width: 32%;
+    background: #000033;
+  }
+
+  .sfo-strip.is-night {
+    background: #000033;
+    border-color: #0000AA;
+  }
+
+  .sfo-strip.is-night::before {
+    background: #550055;
+    border-left-color: #0000AA;
+  }
+
+  .sfo-strip.is-night::after {
+    background: #000033;
+  }
+
+  .sfo-strip.is-day {
+    background: #0055AA;
+    border-color: #00FFFF;
+  }
+
+  .sfo-strip.is-day::before {
+    background: #0055AA;
+    border-left-color: #FFAA00;
+  }
+
+  .sfo-strip.is-day::after {
+    background: #FFAA00;
+  }
+
+  .sfo-strip > * {
+    z-index: 1;
+  }
+
+  .sfo-code {
+      top: 5px;
+      left: 8px;
+      color: #00ffff;
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+  .local-label {
+      top: 5px;
+      right: 8px;
+      color: #FFAA00;
+      font-size: 7px;
+      font-weight: 700;
+    letter-spacing: .8px;
+  }
+
+  .sfo-strip.is-day .local-label,
+  .sfo-strip.is-day .sfo-date {
+    color: #000033;
+  }
+
+  .sfo-strip.is-night .local-label {
+    color: #FFAA00;
+  }
+
+  .sfo-strip.is-night .sfo-date {
+    color: #FFFFFF;
+  }
+
+    .sfo-time {
+      position: absolute;
+      top: 13px;
+      left: 8px;
+      color: #FFFFFF;
+      font-size: 23px;
+      font-weight: 700;
+      letter-spacing: -1px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .sfo-time .period {
+      margin-left: 2px;
+      color: #FF5555;
+      font-size: 9px;
+      letter-spacing: 0;
+      vertical-align: top;
+    }
+
+    .sfo-date {
+      right: 8px;
+      bottom: 5px;
+      color: #FFFFFF;
+      font-size: 7px;
+      font-weight: 700;
+      letter-spacing: .7px;
+    }
+
+    .status-band {
+      position: absolute;
+      top: 171px;
+      right: 0;
+      left: 0;
+      height: 47px;
+      background: #000033;
+    }
+
+    .status-band::before,
+    .status-band::after {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      content: "";
+    }
+
+    .status-band::before {
+      left: 0;
+      background: #FF5555;
+    }
+
+    .status-band::after {
+      right: 0;
+      background: #00FFFF;
+    }
+
+    .steps-row {
+      position: absolute;
+      top: 15px;
+      left: 20px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      height: 18px;
+    }
+
+    .steps-icon {
+      width: 18px;
+      height: 15px;
+      flex: 0 0 auto;
+    }
+
+    .steps-value,
+    .battery-value {
+      color: #FFFFFF;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 18px;
+    }
+
+    .fuel-row {
+      position: absolute;
+      top: 15px;
+      right: 20px;
+      display: flex;
+      gap: 5px;
+      align-items: center;
+      height: 18px;
+    }
+
+    .battery-icon {
+      width: 31px;
+      height: 15px;
+      flex: 0 0 auto;
+    }
+
+    @media (max-width: 460px) {
+      body { padding-right: 8px; padding-left: 8px; }
+      h1 { font-size: 25px; letter-spacing: 2px; }
+      .preview-shell { margin-top: 20px; }
+    }
+  </style>
+</head>
+<body>
+  <main class="board">
+    <section class="intro" aria-labelledby="theme-title">
+      <p class="eyebrow">PEBBLE TIME 2 / SINGLE LAYER STUDY</p>
+      <h1 id="theme-title">PACIFIC RELAY</h1>
+      <p class="concept">サンフランシスコ在住の視点で、東京とサンフランシスコを結ぶレトロ航空案内板＋80年代デジタル計器。HNDの巨大JSTを主役に、国際日付変更線をまたぐSFO便の到着情報を一画面へ。</p>
+      <div class="palette" aria-label="使用色">
+        <span class="swatch"><i class="oxford"></i>OXFORD</span>
+        <span class="swatch"><i class="ink"></i>INK</span>
+        <span class="swatch"><i class="white"></i>WHITE</span>
+        <span class="swatch"><i class="cyan"></i>CYAN</span>
+        <span class="swatch"><i class="coral"></i>HND</span>
+        <span class="swatch"><i class="amber"></i>AMBER</span>
+        <span class="swatch"><i class="gray"></i>GRID</span>
+        <span class="swatch"><i class="sfo-day"></i>SFO DAY</span>
+        <span class="swatch"><i class="sfo-night"></i>SFO NIGHT</span>
+      </div>
+    </section>
+
+    <div class="preview-shell" aria-label="Pebble Time 2 watchface preview at two times scale">
+      <section class="watchface" aria-label="PACIFIC RELAY: HND Tokyo 3:45 PM August 16 Sunday, San Francisco 11:45 PM August 15 Saturday, 8432 steps, 82 percent battery">
+        <svg class="globe" viewBox="0 0 180 180" aria-hidden="true" focusable="false">
+          <circle cx="90" cy="90" r="88" fill="none" stroke="#0000AA" stroke-width="1" />
+          <ellipse cx="90" cy="90" rx="61" ry="88" fill="none" stroke="#0000AA" stroke-width="1" />
+          <ellipse cx="90" cy="90" rx="29" ry="88" fill="none" stroke="#0000AA" stroke-width="1" />
+          <ellipse cx="90" cy="90" rx="88" ry="57" fill="none" stroke="#0000AA" stroke-width="1" />
+          <ellipse cx="90" cy="90" rx="88" ry="29" fill="none" stroke="#0000AA" stroke-width="1" />
+          <path d="M13 61 C34 45 60 38 90 39 C120 38 146 45 167 61" fill="none" stroke="#0000AA" stroke-width="1" />
+          <path d="M13 119 C34 135 60 142 90 141 C120 142 146 135 167 119" fill="none" stroke="#0000AA" stroke-width="1" />
+          <path d="M25 44 C39 38 52 40 63 47 M121 45 C136 39 151 41 164 49" fill="none" stroke="#0000AA" stroke-width="1" />
+        </svg>
+
+        <div class="brand">PACIFIC RELAY</div>
+        <div class="flight-number">PR-082 / HND→SFO</div>
+
+        <div class="primary-kicker">HND / JST</div>
+        <div class="primary-date">AUG 16 SUN</div>
+        <div class="primary-time">3:45<span class="period">PM</span></div>
+
+        <svg class="route-map" viewBox="0 0 184 28" aria-hidden="true" focusable="false">
+          <path d="M8 20 Q92 -12 176 20" fill="none" stroke="#005555" stroke-width="1" />
+          <line x1="92" y1="1" x2="92" y2="23" stroke="#ffaa00" stroke-width="1" stroke-dasharray="2 2" />
+          <circle cx="8" cy="20" r="3" fill="#ff5555" />
+          <circle cx="48" cy="9" r="1.5" fill="#FFFFFF" />
+          <circle cx="92" cy="5" r="1.5" fill="#ffaa00" />
+          <circle cx="134" cy="9" r="1.5" fill="#FFFFFF" />
+          <circle cx="176" cy="20" r="3" fill="#00ffff" />
+        </svg>
+        <div class="route-from">HND</div>
+        <div class="route-to">SFO</div>
+        <div class="dateline">DATE LINE</div>
+
+        <div class="sfo-strip is-night">
+          <div class="sfo-code">SFO / PDT</div>
+          <div class="local-label">LOCAL</div>
+          <div class="sfo-time">11:45<span class="period">PM</span></div>
+          <div class="sfo-date">AUG 15 SAT</div>
+        </div>
+
+        <div class="status-band">
+          <div class="steps-row">
+            <svg class="steps-icon" viewBox="0 0 18 14" aria-hidden="true" focusable="false">
+              <ellipse cx="5" cy="9" rx="2.5" ry="4" transform="rotate(-18 5 9)" fill="#ff5555" />
+              <circle cx="2.8" cy="3.7" r="1" fill="#ff5555" />
+              <circle cx="5.1" cy="2.7" r="1" fill="#ff5555" />
+              <ellipse cx="12.5" cy="7" rx="2.5" ry="4" transform="rotate(18 12.5 7)" fill="#ff5555" />
+              <circle cx="11.8" cy="1.7" r="1" fill="#ff5555" />
+              <circle cx="14.2" cy="2.6" r="1" fill="#ff5555" />
+            </svg>
+            <span class="steps-value">8,432</span>
+          </div>
+          <div class="fuel-row">
+            <svg class="battery-icon" viewBox="0 0 30 14" aria-hidden="true" focusable="false">
+              <rect x="1" y="2" width="24" height="10" fill="none" stroke="#00ffff" stroke-width="1.5" />
+              <rect x="25.5" y="5" width="3" height="4" fill="#00ffff" />
+              <rect x="3.5" y="4.5" width="18" height="5" fill="#ffaa00" />
+            </svg>
+            <span class="battery-value">82%</span>
+          </div>
+        </div>
+      </section>
+    </div>
+  </main>
+</body>
+</html>

@@ -1,0 +1,21 @@
+{
+  "name": "pacific-relay-pebble",
+  "author": "naoyamd",
+  "version": "1.0.0",
+  "keywords": ["pebble-app", "watchface"],
+  "private": true,
+  "dependencies": {},
+  "pebble": {
+    "displayName": "PACIFIC RELAY",
+    "uuid": "6e0b8f2e-1d5e-4c31-9e73-8a8e6ea52b4d",
+    "sdkVersion": "3",
+    "targetPlatforms": ["emery"],
+    "capabilities": ["health"],
+    "watchapp": {
+      "watchface": true
+    },
+    "resources": {
+      "media": []
+    }
+  }
+}
