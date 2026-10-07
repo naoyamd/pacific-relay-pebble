@@ -1,0 +1,18 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "transparent_background": false,
+  "assets": [
+    {
+      "key": "press",
+      "prompt": "Use case: stylized-concept. Asset type: ORIGINAL small illustrated banner for a Pebble 200x228 watchface. Create a wide 3:1 horizontal print illustration, no watch mockup and no text. Subject: one magnificent curling Pacific surf wave seen side-on, linking Japanese woodblock prints and California surf poster culture. A single giant curling wave occupies left two thirds; two quiet layered swells continue to the right edge. Bold simplified modern linocut silhouette, clear hand-cut sweeping curved bands, stylized foam rendered as a few large graphic shapes. Strict flat limited palette: deep dark navy #000055, sea teal #005555, mid blue #0055AA, warm cream #FFFFAA, tiny burnt orange #AA5500 accents. Warm cream background. No smooth gradients, no fine dots or grain, no clouds, no mountains, no horizon sun, no globe, no writing or labels, no watermark. This illustration will be displayed at only 184x58 pixels, so extremely bold shapes, thick marks, 5px-wide feature equivalent. Full bleed landscape with no border. Sophisticated editorial artwork, not a generic icon."
+    },
+    {
+      "key": "grove",
+      "prompt": "Use case: stylized-concept. Asset type: ORIGINAL graphic vertical artwork for a Pebble watchface. Create a portrait 1:2 illustration, no watch mockup and no text. Subject: a poetic meeting of a majestic California redwood grove and a Japanese cedar forest. Three imposing angular conifers with large triangular silhouettes and straight thick trunks, one redwood bark trunk in rust orange, layered tree silhouettes in dark teal and forest green, few broad ivory light shafts between trees. Strong graphic silhouette and monumental vertical rhythm. Sophisticated mid-century national park screen print, clean blocks and thick cut edges. Strict flat palette deep navy #000033, dark forest #005555, evergreen #005500, rust #AA5500, gold #AAAA55, cream #FFFFAA. Dark forest backdrop full bleed. No gradients, no fine grain or hatching, no tiny leaves, no landscape sun or moon, no globe, no text, no labels, no border, no watermark. Artwork will be displayed only 76px wide by 110px tall; use very few big legible shapes, genuinely readable tiny."
+    },
+    {
+      "key": "radio",
+      "prompt": "Use case: stylized-concept. Asset type: ORIGINAL shortwave radio dial graphic to sit inside a Pebble watchface. Create a very wide 3:1 illustration, no watch mockup and no text. Subject: a close frontal crop of a gorgeous vintage 1970s Japanese shortwave receiver dial and California independent-radio aesthetic. Two large circular concentric tuning knobs left and right, central bold rectangular tuner window with broad vertical tick marks and one strong amber needle. Brushed metal is represented by clean flat color blocks only. Deep navy #000033 background, orange #FFAA55, rust #AA5500, ivory #FFFFAA and steel slate #555555. Graphic retro industrial screenprint with simple precise symmetry, thick geometry, warm inviting object. No gradients, no reflections, no fine texture, no small details, no text or numbers or letters or logo, no signal strength claim, no globe, no horizon, no watermark. It will be displayed at only 176x54 pixels. Use large obvious knobs and 7 big tuning marks so the radio is readable tiny. Full bleed with all objects comfortably framed."
+    }
+  ]
+}

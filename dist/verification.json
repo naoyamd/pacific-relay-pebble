@@ -1,0 +1,16 @@
+{
+  "orbit-atlas": {
+    "version": "1.0.0",
+    "sha256": "b6ef2fa8db6cfee4e6bd7751d1c3aa54375c9e660cbe9d7fcac77895e2c40cdd",
+    "clock_cases": 13,
+    "emulator_frames": 10,
+    "hardware_display_verified": true
+  },
+  "pacific-press": {
+    "version": "1.0.1",
+    "sha256": "0ff1f7c574457f24bba8403f9ce8f4411c0153dbd904b924e74af206519af2cc",
+    "clock_cases": 13,
+    "emulator_frames": 17,
+    "hardware_display_verified": true
+  }
+}

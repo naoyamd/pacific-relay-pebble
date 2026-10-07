@@ -1,0 +1,19 @@
+{
+  "tool": "built-in image_gen.imagegen",
+  "mode": "edit",
+  "input": "designs/assets/new-studies/press.png",
+  "output": "designs/assets/new-studies/press-white-v2.png",
+  "transparent_background": false,
+  "prompt": "Use case: precise-object-edit. Asset: existing Pacific wave illustration for a Pebble watchface, attached file is the EDIT TARGET. Change ONLY the yellow/cream paper/background and all cream foam/negative-space shapes to clean PURE WHITE #FFFFFF, including the open area at upper right. Remove any yellow cast, paper texture, vignette or shading from white areas. Preserve the existing wave silhouette, curling form, composition, thin orange accent, flat blue/navy/teal colors and every visual object. Maintain the exact very wide 3:1 framing and image proportions. No extra objects, no text, no logos, no watch mockup. The result must be a full-bleed opaque illustration on a uniform pure white background, visually seamless when placed on a white watch display.",
+  "native_asset": "resources/press/images/wave-white.png",
+  "conversion": {
+    "viewport": [
+      184,
+      39
+    ],
+    "crop": "center, matching HTML object-fit cover",
+    "resize": "Lanczos",
+    "palette": "12 used colors from 16 fixed Pebble-safe palette entries",
+    "storage": "opaque indexed PNG, 4 bits per pixel"
+  }
+}

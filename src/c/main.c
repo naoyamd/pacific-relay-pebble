@@ -23,7 +23,7 @@ static bool s_health_subscribed;
 static struct tm s_jst;
 static struct tm s_sfo;
 static bool s_sfo_dst;
-static bool s_sfo_day;
+static bool s_secondary_day;
 
 static uint32_t s_steps;
 static uint8_t s_battery;
@@ -37,6 +37,39 @@ static char s_sfo_zone[12];
 static char s_sfo_date[16];
 static char s_steps_text[12];
 static char s_battery_text[8];
+
+// Both packages share the drawing code; the reverse package defines this flag.
+#ifdef PRIMARY_PACIFIC
+#define PRIMARY_TIME s_sfo_time
+#define PRIMARY_PERIOD s_sfo_period
+#define PRIMARY_DATE s_sfo_date
+#define PRIMARY_ZONE s_sfo_zone
+#define PRIMARY_COLOR COLOR_CYAN
+#define SECONDARY_TIME s_jst_time
+#define SECONDARY_PERIOD s_jst_period
+#define SECONDARY_DATE s_jst_date
+#define SECONDARY_ZONE "HND / JST"
+#define SECONDARY_LOCATION "JAPAN"
+#define SECONDARY_COLOR COLOR_CORAL
+#define ROUTE_FROM "SFO"
+#define ROUTE_TO "HND"
+#define ROUTE_LABEL "PR-082 SFO>HND"
+#else
+#define PRIMARY_TIME s_jst_time
+#define PRIMARY_PERIOD s_jst_period
+#define PRIMARY_DATE s_jst_date
+#define PRIMARY_ZONE "HND / JST"
+#define PRIMARY_COLOR COLOR_CORAL
+#define SECONDARY_TIME s_sfo_time
+#define SECONDARY_PERIOD s_sfo_period
+#define SECONDARY_DATE s_sfo_date
+#define SECONDARY_ZONE s_sfo_zone
+#define SECONDARY_LOCATION "LOCAL"
+#define SECONDARY_COLOR COLOR_CYAN
+#define ROUTE_FROM "HND"
+#define ROUTE_TO "SFO"
+#define ROUTE_LABEL "PR-082 HND>SFO"
+#endif
 
 static const char *const MONTHS[] = {
   "JAN", "FEB", "MAR", "APR", "MAY", "JUN",
@@ -84,7 +117,11 @@ static void refresh_time(void) {
   }
 
   sfo_time_from_utc(now, &s_sfo, &s_sfo_dst);
-  s_sfo_day = s_sfo.tm_hour >= 6 && s_sfo.tm_hour < 18;
+#ifdef PRIMARY_PACIFIC
+  s_secondary_day = s_jst.tm_hour >= 6 && s_jst.tm_hour < 18;
+#else
+  s_secondary_day = s_sfo.tm_hour >= 6 && s_sfo.tm_hour < 18;
+#endif
 
   format_time_12(&s_jst, s_jst_time, sizeof(s_jst_time), s_jst_period, sizeof(s_jst_period));
   format_date(&s_jst, s_jst_date, sizeof(s_jst_date));
@@ -206,7 +243,7 @@ static void draw_route(GContext *ctx) {
   graphics_context_set_stroke_color(ctx, COLOR_AMBER);
   draw_dashed_vertical(ctx, 100, 80, 102);
 
-  graphics_context_set_fill_color(ctx, COLOR_CORAL);
+  graphics_context_set_fill_color(ctx, PRIMARY_COLOR);
   graphics_fill_circle(ctx, GPoint(16, 98), 3);
   graphics_context_set_fill_color(ctx, COLOR_WHITE);
   graphics_fill_circle(ctx, GPoint(48, 89), 2);
@@ -214,13 +251,13 @@ static void draw_route(GContext *ctx) {
   graphics_fill_circle(ctx, GPoint(100, 83), 2);
   graphics_context_set_fill_color(ctx, COLOR_WHITE);
   graphics_fill_circle(ctx, GPoint(152, 89), 2);
-  graphics_context_set_fill_color(ctx, COLOR_CYAN);
+  graphics_context_set_fill_color(ctx, SECONDARY_COLOR);
   graphics_fill_circle(ctx, GPoint(184, 98), 3);
 
   graphics_context_set_text_color(ctx, COLOR_WHITE);
-  graphics_draw_text(ctx, "HND", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+  graphics_draw_text(ctx, ROUTE_FROM, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
                      GRect(9, 102, 44, 15), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
-  graphics_draw_text(ctx, "SFO", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+  graphics_draw_text(ctx, ROUTE_TO, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
                      GRect(147, 102, 44, 15), GTextOverflowModeFill, GTextAlignmentRight, NULL);
   graphics_context_set_text_color(ctx, COLOR_AMBER);
   graphics_draw_text(ctx, "DATE LINE", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
@@ -232,39 +269,39 @@ static void draw_header(GContext *ctx) {
   graphics_draw_text(ctx, "PACIFIC", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
                      GRect(9, 3, 82, 16), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_context_set_text_color(ctx, GColorFromHEX(0xAAAAAA));
-  graphics_draw_text(ctx, "PR-082 HND>SFO", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+  graphics_draw_text(ctx, ROUTE_LABEL, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
                      GRect(93, 3, 98, 16), GTextOverflowModeFill, GTextAlignmentRight, NULL);
 
-  graphics_context_set_text_color(ctx, COLOR_CORAL);
-  graphics_draw_text(ctx, "HND / JST", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+  graphics_context_set_text_color(ctx, PRIMARY_COLOR);
+  graphics_draw_text(ctx, PRIMARY_ZONE, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
                      GRect(9, 19, 82, 16), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_context_set_text_color(ctx, COLOR_WHITE);
-  graphics_draw_text(ctx, s_jst_date, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+  graphics_draw_text(ctx, PRIMARY_DATE, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
                      GRect(117, 19, 74, 16), GTextOverflowModeFill, GTextAlignmentRight, NULL);
 
   const GFont time_font = fonts_get_system_font(FONT_KEY_ROBOTO_BOLD_SUBSET_49);
   const GRect time_frame = GRect(8, 27, 180, 58);
   const GSize time_size = graphics_text_layout_get_content_size(
-      s_jst_time, time_font, time_frame, GTextOverflowModeFill, GTextAlignmentLeft);
+      PRIMARY_TIME, time_font, time_frame, GTextOverflowModeFill, GTextAlignmentLeft);
   int period_x = 8 + time_size.w + 2;
   if (period_x > 162) {
     period_x = 162;
   }
-  graphics_draw_text(ctx, s_jst_time, time_font, time_frame,
+  graphics_draw_text(ctx, PRIMARY_TIME, time_font, time_frame,
                      GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_context_set_text_color(ctx, COLOR_CORAL);
-  graphics_draw_text(ctx, s_jst_period, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+  graphics_draw_text(ctx, PRIMARY_PERIOD, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
                      GRect(period_x, 35, 38, 18), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
 }
 
-static void draw_sfo_strip(GContext *ctx) {
+static void draw_secondary_strip(GContext *ctx) {
   const GRect inner = GRect(9, 129, 182, 40);
   const int left_width = 112;
-  const GColor left_color = s_sfo_day ? COLOR_DAY : COLOR_NIGHT;
-  const GColor right_color = s_sfo_day ? COLOR_AMBER : COLOR_INK;
-  const GColor border_color = s_sfo_day ? COLOR_CYAN : COLOR_GRID;
-  const GColor rail_color = s_sfo_day ? COLOR_AMBER : COLOR_GRID;
-  const GColor right_text = s_sfo_day ? COLOR_INK : COLOR_WHITE;
+  const GColor left_color = s_secondary_day ? COLOR_DAY : COLOR_NIGHT;
+  const GColor right_color = s_secondary_day ? COLOR_AMBER : COLOR_INK;
+  const GColor border_color = s_secondary_day ? COLOR_CYAN : COLOR_GRID;
+  const GColor rail_color = s_secondary_day ? COLOR_AMBER : COLOR_GRID;
+  const GColor right_text = s_secondary_day ? COLOR_INK : COLOR_WHITE;
 
   graphics_context_set_fill_color(ctx, left_color);
   graphics_fill_rect(ctx, GRect(inner.origin.x, inner.origin.y, left_width, inner.size.h), 0, GCornerNone);
@@ -276,26 +313,26 @@ static void draw_sfo_strip(GContext *ctx) {
   graphics_context_set_fill_color(ctx, rail_color);
   graphics_fill_rect(ctx, GRect(9, 129, 3, 40), 0, GCornerNone);
 
-  graphics_context_set_text_color(ctx, COLOR_CYAN);
-  graphics_draw_text(ctx, s_sfo_zone, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+  graphics_context_set_text_color(ctx, SECONDARY_COLOR);
+  graphics_draw_text(ctx, SECONDARY_ZONE, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
                      GRect(17, 130, 102, 16), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_context_set_text_color(ctx, right_text);
-  graphics_draw_text(ctx, "LOCAL", fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+  graphics_draw_text(ctx, SECONDARY_LOCATION, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
                      GRect(140, 130, 45, 16), GTextOverflowModeFill, GTextAlignmentRight, NULL);
 
-  const GFont sfo_time_font = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
-  const GRect sfo_time_frame = GRect(17, 139, 102, 29);
-  const GSize sfo_time_size = graphics_text_layout_get_content_size(
-      s_sfo_time, sfo_time_font, sfo_time_frame, GTextOverflowModeFill, GTextAlignmentLeft);
-  const int sfo_period_x = 17 + sfo_time_size.w + 2;
+  const GFont time_font = fonts_get_system_font(FONT_KEY_GOTHIC_28_BOLD);
+  const GRect time_frame = GRect(17, 139, 102, 29);
+  const GSize time_size = graphics_text_layout_get_content_size(
+      SECONDARY_TIME, time_font, time_frame, GTextOverflowModeFill, GTextAlignmentLeft);
+  const int period_x = 17 + time_size.w + 2;
   graphics_context_set_text_color(ctx, COLOR_WHITE);
-  graphics_draw_text(ctx, s_sfo_time, sfo_time_font, sfo_time_frame,
+  graphics_draw_text(ctx, SECONDARY_TIME, time_font, time_frame,
                      GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_context_set_text_color(ctx, COLOR_CORAL);
-  graphics_draw_text(ctx, s_sfo_period, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
-                     GRect(sfo_period_x, 143, 24, 16), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
+  graphics_draw_text(ctx, SECONDARY_PERIOD, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+                     GRect(period_x, 143, 24, 16), GTextOverflowModeFill, GTextAlignmentLeft, NULL);
   graphics_context_set_text_color(ctx, right_text);
-  graphics_draw_text(ctx, s_sfo_date, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
+  graphics_draw_text(ctx, SECONDARY_DATE, fonts_get_system_font(FONT_KEY_GOTHIC_14_BOLD),
                      GRect(121, 153, 70, 16), GTextOverflowModeFill, GTextAlignmentRight, NULL);
 }
 
@@ -345,7 +382,7 @@ static void canvas_update_proc(Layer *layer, GContext *ctx) {
   draw_globe(ctx);
   draw_header(ctx);
   draw_route(ctx);
-  draw_sfo_strip(ctx);
+  draw_secondary_strip(ctx);
   draw_status_band(ctx);
 }
 
